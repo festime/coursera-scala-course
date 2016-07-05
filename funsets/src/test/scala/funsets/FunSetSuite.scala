@@ -104,9 +104,9 @@ class FunSetSuite extends FunSuite {
   test("union contains all elements of each set") {
     new TestSets {
       val s = union(s1, s2)
-      assert(contains(s, 1), "Union 1")
-      assert(contains(s, 2), "Union 2")
-      assert(!contains(s, 3), "Union 3")
+      assert(contains(s, 1), "s1 union s2 should contain elements in s1")
+      assert(contains(s, 2), "s1 union s2 should contain elements in s2")
+      assert(!contains(s, 3), "s1 union s2 should not contain elements not in s1 or s2")
     }
   }
 
@@ -130,11 +130,43 @@ class FunSetSuite extends FunSuite {
 
   test("filter contains only a set's elements which are accepted by a given predicate") {
     new TestSets {
-      val s = filter(union(union(s1, s2), s3), ((n: Int) => n < 3))
+      val s = filter((x: Int) => List(1, 2, 3).contains(x), (n: Int) => n < 3)
+      val t = filter((x: Int) => x <= 1000, (x: Int) => x % 2 == 0)
 
       assert(contains(s, 1))
       assert(contains(s, 2))
       assert(!contains(s, 3))
+      assert(!contains(t, 1))
+    }
+  }
+
+  test("forall returns true only when all elements in s satisfies p") {
+    new TestSets {
+      val s = (x: Int) => List(1, 3, 5, 7, 9).contains(x)
+      val t = (x: Int) => x % 2 == 0
+
+      assert(forall(s, (x: Int) => x % 2 == 1))
+      assert(!forall(s, (x: Int) => x < 9))
+      assert(forall(t, (x: Int) => x % 2 == 0))
+    }
+  }
+
+  test("exists returns true only when there exists one element in s satisfies p") {
+    new TestSets {
+      val s = (x: Int) => List(1, 2, 3, 4).contains(x)
+      val t = (x: Int) => List(1, 3, 4, 5, 7, 1000).contains(x)
+
+      assert(exists(s, (x: Int) => x == 2))
+      assert(!exists(t, (x: Int) => x == 2))
+    }
+  }
+
+  test("map transforms a given set into another one") {
+    new TestSets {
+      val s = (x: Int) => List(1, 3, 4, 5, 7, 1000).contains(x)
+      val minusOne = (x: Int) => x - 1
+
+      assert(contains(map(s, minusOne), 999))
     }
   }
 }
