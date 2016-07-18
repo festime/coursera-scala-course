@@ -86,7 +86,9 @@ object Huffman {
    * of a leaf is the frequency of the character.
    */
     def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] =
-      freqs.sortBy(_._2).map {
+      freqs.sortBy {
+        case (char: Char, weight: Int) => weight
+      }.map {
         case (char: Char, weight: Int) => new Leaf(char, weight)
       }
 
@@ -152,7 +154,10 @@ object Huffman {
    * frequencies from that text and creates a code tree based on them.
    */
     def createCodeTree(chars: List[Char]): CodeTree = {
-      until(singleton, combine)(makeOrderedLeafList(times(chars)))(0)
+      val listOfSingleCodeTree =
+        until(singleton, combine)(makeOrderedLeafList(times(chars)))
+
+      listOfSingleCodeTree(0)
     }
 
 
